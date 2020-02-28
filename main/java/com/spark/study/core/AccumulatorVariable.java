@@ -14,7 +14,6 @@ import org.apache.spark.util.LongAccumulator;
  * @author alanwang
  *
  */
-@SuppressWarnings("unused")
 public class AccumulatorVariable {
 	public static void main(String[] args) {
 		SparkConf conf = new SparkConf()
