@@ -2,11 +2,11 @@ package com.spark.study.sql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -25,7 +25,6 @@ import org.apache.spark.sql.types.StructField;
 
 import scala.Tuple2;
 
-
 /**
  * 每日top3热点搜索词统计
  * @author alanwang
@@ -35,7 +34,7 @@ import scala.Tuple2;
 public class DailyTopThreeKeyword {
 	public static void main(String[] args) throws AnalysisException {
 		SparkConf conf = new SparkConf()
-				.setAppName("DailyTopThreeKeyword");
+				.setAppName("DailyTopThreeKeyword").setMaster("local");
 		SparkSession sparkSession = SparkSession
 				.builder()
 				.appName("DailyTopThreeKeyword")
@@ -46,8 +45,8 @@ public class DailyTopThreeKeyword {
 		JavaSparkContext sc = new JavaSparkContext(sparkSession.sparkContext());
 		
 		//1.从HDFS中获取数据，并创建RDD
-		JavaRDD<String> rawRdd = sc.textFile("hdfs://master:9000/spark-study/keyword.txt");
-		//JavaRDD<String> rawRdd = sc.textFile("/Users/alanwang/Documents/Work/textFile/keyword.txt");
+		//JavaRDD<String> rawRdd = sc.textFile("hdfs://master:9000/spark-study/keyword.txt");
+		JavaRDD<String> rawRdd = sc.textFile("/Users/alanwang/Documents/Work/textFile/keyword.txt");
 		
 		//2.在实际企业项目开发中，这个查询条件，是通过J2EE平台插入到某个MySQL表中的
 		//通常会用Spring框架和ORM框架（MyBatis）去提取MySQL表中的查询条件
@@ -236,11 +235,11 @@ public class DailyTopThreeKeyword {
 		
 		//9.将rdd转换为dataframe，并存至hive表中
 		Dataset<Row> resultDs = sparkSession.createDataFrame(sortedRowRdd, DataTypes.createStructType(structFields));
-		//resultDs.show();
+		resultDs.show();
 		
 		//将结果存至hive表
-		sparkSession.sql("DROP TABLE IF EXISTS daily_topthree_keyword_uv");
-		resultDs.write().saveAsTable("daily_topthree_keyword_uv");
+		/*sparkSession.sql("DROP TABLE IF EXISTS daily_topthree_keyword_uv");
+		resultDs.write().saveAsTable("daily_topthree_keyword_uv");*/
 		
 		sparkSession.catalog().dropTempView("daily_keyword_uv");
 		sc.close();
